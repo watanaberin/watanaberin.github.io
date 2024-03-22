@@ -28,7 +28,7 @@
 <meta property="og:description" content="在 Python 中每一个 .py 都可以视作一个模块（module），而每一个包含 init.py 的目录则可以视作包（packge）。 在 one.py 中简单定义了一个函数 One: 123456def One():    print(&quot;module one&quot;)def OneOne():    print(&quot;module one&#x2F;one&quot;) 如果我们想">
 <meta property="og:locale">
 <meta property="article:published_time" content="2024-03-22T08:31:00.000Z">
-<meta property="article:modified_time" content="2024-03-22T10:15:57.729Z">
+<meta property="article:modified_time" content="2024-03-22T10:17:46.087Z">
 <meta property="article:author" content="rin">
 <meta property="article:tag" content="python">
 <meta name="twitter:card" content="summary">
@@ -210,7 +210,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2024-03-22 16:31:00 / Modified: 18:15:57" itemprop="dateCreated datePublished" datetime="2024-03-22T16:31:00+08:00">2024-03-22</time>
+              <time title="Created: 2024-03-22 16:31:00 / Modified: 18:17:46" itemprop="dateCreated datePublished" datetime="2024-03-22T16:31:00+08:00">2024-03-22</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -243,6 +243,8 @@
 <p>如果我们想要在 main.py 中使用的话，那么可以直接 import，这种方式也称之为“模块导入”。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import packs</span><br><span class="line"></span><br><span class="line">packs.one.One()</span><br></pre></td></tr></table></figure>
 <p>运行后就会打印 module one，另外也可以看到在 packs 目录下生成一个 <strong>pycache</strong> 的新目录，这是编译后中间文件，可以提升模块载入速度。</p>
+<span id="more"></span>
+
 <p>除了这种全局导入外，还可以在局部作用域导入。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def main():</span><br><span class="line">    from packs.one import One</span><br><span class="line">    One()</span><br><span class="line"></span><br><span class="line">main()</span><br></pre></td></tr></table></figure>
 <h3 id="init-文件"><a href="#init-文件" class="headerlink" title="init 文件"></a>init 文件</h3><p><strong>init</strong>.py 每当导入当前包的模块的时候就会运行一次。<br>我们可以再 <strong>init</strong>.py 输入导出的模块，外部使用的就不需要很长的导入路径了。</p>
@@ -280,8 +282,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/post/efa67fef.html" rel="prev" title="我的Mac上安装了什么软体">
-      <i class="fa fa-chevron-left"></i> 我的Mac上安装了什么软体
+    <a href="/post/dc97195f.html" rel="prev" title="在项目中引入 MongoDB Sharding">
+      <i class="fa fa-chevron-left"></i> 在项目中引入 MongoDB Sharding
     </a></div>
       <div class="post-nav-item"></div>
     </div>
@@ -358,7 +360,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -371,7 +373,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

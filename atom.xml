@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-03-22T10:15:57.729Z</updated>
+  <updated>2024-03-22T10:17:46.087Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,16 +21,15 @@
     <link href="http://example.com/post/55c2460.html"/>
     <id>http://example.com/post/55c2460.html</id>
     <published>2024-03-22T08:31:00.000Z</published>
-    <updated>2024-03-22T10:15:57.729Z</updated>
+    <updated>2024-03-22T10:17:46.087Z</updated>
     
     
-      
-      
-        
-        
-    <summary type="html"></summary>
-        
-      
+    <summary type="html">&lt;h3 id=&quot;&quot;&gt;&lt;a href=&quot;#&quot; class=&quot;headerlink&quot; title=&quot;&quot;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在 Python 中每一个 .py 都可以视作一个模块（module），而每一个包含 &lt;strong&gt;init&lt;/strong&gt;.py 的目录则可以视作包（packge）。&lt;/p&gt;
+&lt;p&gt;在 one.py 中简单定义了一个函数 One:&lt;/p&gt;
+&lt;figure class=&quot;highlight plaintext&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;def One():&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    print(&amp;quot;module one&amp;quot;)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;def OneOne():&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    print(&amp;quot;module one/one&amp;quot;)&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;如果我们想要在 main.py 中使用的话，那么可以直接 import，这种方式也称之为“模块导入”。&lt;/p&gt;
+&lt;figure class=&quot;highlight plaintext&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;import packs&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;packs.one.One()&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;运行后就会打印 module one，另外也可以看到在 packs 目录下生成一个 &lt;strong&gt;pycache&lt;/strong&gt; 的新目录，这是编译后中间文件，可以提升模块载入速度。&lt;/p&gt;</summary>
     
     
     
@@ -40,6 +39,32 @@
     
     
     <category term="python" scheme="http://example.com/tags/python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>在项目中引入 MongoDB Sharding</title>
+    <link href="http://example.com/post/dc97195f.html"/>
+    <id>http://example.com/post/dc97195f.html</id>
+    <published>2023-02-02T16:00:00.000Z</published>
+    <updated>2024-03-22T13:23:54.377Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;之前在项目中调研和引入了 MongoDB Sharding，在此整理一下笔记和文档。&lt;/p&gt;
+&lt;h1 id=&quot;介绍&quot;&gt;&lt;a href=&quot;#介绍&quot; class=&quot;headerlink&quot; title=&quot;介绍&quot;&gt;&lt;/a&gt;介绍&lt;/h1&gt;&lt;h2 id=&quot;原因和解决目标&quot;&gt;&lt;a href=&quot;#原因和解决目标&quot; class=&quot;headerlink&quot; title=&quot;原因和解决目标&quot;&gt;&lt;/a&gt;原因和解决目标&lt;/h2&gt;&lt;p&gt;目前项目利用 Mongo Replication 保证了数据库中的全部数据都会有多份拷贝，保证了冗余和高可用，但单台机器的 CPU、内存、磁盘的限制会达到数据库的瓶颈，大部分的读写瓶颈也阻塞在一台服务器，出现系统无法支持更多吞吐及海量数据的存储性能等问题。用户的数据量永远在增加，而机器提升性能有瓶颈。因此考虑引入 MongoDB Sharding，「横向」扩展来解决目前项目中遇到的问题。MongoDB Sharding 本质是用多台机器来存储数据，每个机器仅存储部分的数据。&lt;/p&gt;
+&lt;p&gt;实际上生产环境已经遇到的问题 1) 生产环境存在〇〇表由于业务高频读写产生瓶颈 2）〇〇数据存储达到 TB 级别，存储量为百亿级别&lt;/p&gt;
+&lt;p&gt;Sharding的优势：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;读写方面：sharding将读写负载均匀到各个shard，当机器的读写量达到当前部署模式的瓶颈时可以通过水平扩展Shard来负载读写；&lt;/li&gt;
+&lt;li&gt;扩容方面：每个Shard保存一部分数据，可以通过增加Shard来扩容，理论上mongo可以利用扩展shard存储无限的数据；&lt;a href=&quot;https://www.mongodb.com/docs/manual/core/sharded-cluster-requirements/&quot;&gt;Shard key &amp;amp; max size of collection&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;高可用方面：即便某个Shard不可用了，整个集群也可以对外提供服务；&lt;br&gt;Mongo Shard本身不支持备份，因此考虑使用Replica Set來搭建 MongoDB Sharded Cluster，即每个Shard部署为Replica Set。</summary>
+    
+    
+    
+    <category term="tech" scheme="http://example.com/categories/tech/"/>
+    
+    
+    <category term="MongoDB" scheme="http://example.com/tags/MongoDB/"/>
     
   </entry>
   

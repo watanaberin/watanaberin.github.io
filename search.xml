@@ -87,6 +87,8 @@
 <p>如果我们想要在 main.py 中使用的话，那么可以直接 import，这种方式也称之为“模块导入”。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">import packs</span><br><span class="line"></span><br><span class="line">packs.one.One()</span><br></pre></td></tr></table></figure>
 <p>运行后就会打印 module one，另外也可以看到在 packs 目录下生成一个 <strong>pycache</strong> 的新目录，这是编译后中间文件，可以提升模块载入速度。</p>
+<span id="more"></span>
+
 <p>除了这种全局导入外，还可以在局部作用域导入。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">def main():</span><br><span class="line">    from packs.one import One</span><br><span class="line">    One()</span><br><span class="line"></span><br><span class="line">main()</span><br></pre></td></tr></table></figure>
 <h3 id="init-文件"><a href="#init-文件" class="headerlink" title="init 文件"></a>init 文件</h3><p><strong>init</strong>.py 每当导入当前包的模块的时候就会运行一次。<br>我们可以再 <strong>init</strong>.py 输入导出的模块，外部使用的就不需要很长的导入路径了。</p>
@@ -113,6 +115,170 @@
       </categories>
       <tags>
         <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在项目中引入 MongoDB Sharding</title>
+    <url>/post/dc97195f.html</url>
+    <content><![CDATA[<p>之前在项目中调研和引入了 MongoDB Sharding，在此整理一下笔记和文档。</p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><h2 id="原因和解决目标"><a href="#原因和解决目标" class="headerlink" title="原因和解决目标"></a>原因和解决目标</h2><p>目前项目利用 Mongo Replication 保证了数据库中的全部数据都会有多份拷贝，保证了冗余和高可用，但单台机器的 CPU、内存、磁盘的限制会达到数据库的瓶颈，大部分的读写瓶颈也阻塞在一台服务器，出现系统无法支持更多吞吐及海量数据的存储性能等问题。用户的数据量永远在增加，而机器提升性能有瓶颈。因此考虑引入 MongoDB Sharding，「横向」扩展来解决目前项目中遇到的问题。MongoDB Sharding 本质是用多台机器来存储数据，每个机器仅存储部分的数据。</p>
+<p>实际上生产环境已经遇到的问题 1) 生产环境存在〇〇表由于业务高频读写产生瓶颈 2）〇〇数据存储达到 TB 级别，存储量为百亿级别</p>
+<p>Sharding的优势：</p>
+<ul>
+<li>读写方面：sharding将读写负载均匀到各个shard，当机器的读写量达到当前部署模式的瓶颈时可以通过水平扩展Shard来负载读写；</li>
+<li>扩容方面：每个Shard保存一部分数据，可以通过增加Shard来扩容，理论上mongo可以利用扩展shard存储无限的数据；<a href="https://www.mongodb.com/docs/manual/core/sharded-cluster-requirements/">Shard key &amp; max size of collection</a></li>
+<li>高可用方面：即便某个Shard不可用了，整个集群也可以对外提供服务；<br>Mongo Shard本身不支持备份，因此考虑使用Replica Set來搭建 MongoDB Sharded Cluster，即每个Shard部署为Replica Set。<span id="more"></span></li>
+</ul>
+<p>优化的目标：</p>
+<ul>
+<li>利用多台机器分担单机mongo的读写、存储压力；（性能）</li>
+<li>每个Shard 为 Replica Set模式，利用冗余维持可靠性；（可用性、可靠性）</li>
+<li>项目上应用不同的线上环境（业务此处略）</li>
+</ul>
+<h2 id="Sharding-Strategy"><a href="#Sharding-Strategy" class="headerlink" title="Sharding Strategy"></a>Sharding Strategy</h2><p>Mongo Shard方案最重要的部分在于 Shard Key 的选择，不存在完美的 shard key，只有选择 shard key 时应当注意和考虑的要素。不会出现一种 shard key 可以满足所有的增删改查操作。这需要从应用场景中抽象出用来选择 shard key 的元素，包括各个数据字段的意义，使用的业务价值以及未来业务的增长点。如果在一开始 shard key 的选择出现错误，那么在接下来的应用过程中想要改变 shard key 是一件极其繁琐的过程。（即使 Mongo支持reshard collection、redefine shardkey）</p>
+<p>Mongo shard 的存储的最小的单元为 chunk，即一个 shard 中会分布多个 chunk，每一个 chunk 都包含它的上下届，在 mongos 上使用 db.stats() 可以查看一个 collection 分布在哪些 shard 上，一个 shard 上包含一个 collection 的那些 chunk，以及一个 chunk 的范围。</p>
+<p>其中 Shard 的上下届的含义和选择 Hashing Key 还是 Range Key 相关，若选择的是 Hashing Key，那么 chunk 的上下届为 Key Hash 后的值，按照 Range Key，那么 chunk 的上下届为 key 的范围。</p>
+<p>以 Hashing Key 举例，id&#x3D;1 和 id&#x3D;1000 hash 后发送到同一个 Shard，Hash 后的 Key 的范围又属于同一个 chunk，那么 id&#x3D;1 和 id&#x3D;1000 的数据会存储到同一个 chunk。若 id&#x3D;1 的数据量一直在增长，这个 chunk 超过一定阈值，会根据chunk 上下届内的范围分裂成两个 chunk；若 id&#x3D;1 的数据增长到 chunk 阈值（ MongoDB 可配置）无法再分裂，这个 chunk 就进化为 jumbo chunk。</p>
+<p>MongoDB分片集群支持的分片策略：</p>
+<ol>
+<li>范围分片，支持基于Shard Key的范围查询；</li>
+<li>哈希分片，能够将写入均衡分布到各个shard；</li>
+<li>Tag aware sharding，可以自定义一些chunk的分布规则；将一段片键范围与一个标记相关联.每个指定的片键范围只能与一个标记相关联,定义的范围不能重叠,也不能对同一个片键范围定义两次；</li>
+</ol>
+<p>为一定范围内的片键制定一个Tag(Zone)，然后再将一些分片加入到这个Tag(Zone)中，于是这一范围内的数据最终就将存储在这个Tag(Zone)中的分片上。Tag(Zone)指定的范围不能有交集。<br>分片内的均衡器在分片间移动Chunk时，范围内的数据仅会在同一Tag(Zone)的分片间移动，以保证分布的合法性，对于那些没有被Tag(Zone)限制的Chunk，则可能出现在任意分片上。</p>
+<ol start="4">
+<li>复合分片：Shard key can contain at most one ‘hashed’ field, and&#x2F;or multiple numerical fields set to a value of 1；复合键可以使用至多一个hashed filed或&#x2F;和多个range field来构成复合键，复合键同时决定了collection的document在shard上的分布，比如{id:”hashed”, time: 1}，那么存在一个租户的数据并不总是分布在一个shard上。以哈希或范围键作为复合片键的前缀（即第一个字段的分片方式）存在区别，mongodb官方提供了对于哈希 &#x2F; 范围 &#x2F; 复合片键在分片一个空的collection的初始化逻辑，hashed-sharding；</li>
+</ol>
+<p>如果shard key为一个递增的字段，比如_id 或者时间戳，资源唯一的int id递增分配）那就不适合使用范围分片的方式来作为分片策略，这样会造成写热点，即新增的数据只会往覆盖最大值的shard中写入；</p>
+<p>如何选择一个片键类型：一个集合包含相同类型的资源列表，并和其他资源隔离</p>
+<p>是否启用Sharding<br>1.（业务上）多租户（略）<br>2.单表的数据量是否很大，能通过不同的机器来分担数据存储；<br>3.单表的读写是否很频繁，能通过将读写分担到不同的机器来缓解压力；<br>4.提前评估业务增长量和规模判断是否需要开启sharding；</p>
+<p>Shard Key选择的原则</p>
+<ul>
+<li>key分布足够离散（sufficient cardinality）；</li>
+<li>写请求均匀分布（evenly distributed write）；</li>
+<li>尽量避免scatter-gather查询（targeted read）；</li>
+</ul>
+<p>片键的选择也有良好的设计模式可以遵守：<br>‒使用一个基于在大多数查询中经常出现的字段的哈希片键；比如多租户表租户 ID、出现在索引中的字段；<br>‒复合片键，由一个低基数（“厚实的”）组成第一部分，高基数组成第二个部分，而且经常是一个单调递增的键。如果在第一部分有足够数量的唯一值（至少是分片数的两倍），将会获得很好的写入和读取分布。</p>
+<p>在业务上对 Shard key 的选择推荐（此处业务是资源属于多个租户且没有全局使用的问题）</p>
+<ol>
+<li>租户表不分片；</li>
+<li>存在租户ID的表使用租户ID作为分片键，使用hash分片；不使用范围分片的原因在于新增租户数据会根据sharding规则落到同一个shard中，造成写热点，chunk数量增多导致balancer机制迁移chunk；</li>
+<li>Shard key必须存在索引或者在复合索引的第一个位置；</li>
+</ol>
+<ul>
+<li>若集合为空，shardCollection操作会自动创建索引</li>
+<li>若集合不为空，shardCollection操作前需要shard key存在于索引中</li>
+<li>迁移时需要先进行添加索引操作再进行shardCollection，保持各个环境的索引统一。</li>
+</ul>
+<ol start="4">
+<li>单租户下部分资源数据量仍很大，需要选择一个能够被再分到小范围的片键。如果你不这样做，MongoDB将会不得不在一个单一的数据段中放置太多文档。当这件事情发生时，最后会在集群中产生“庞大的”数据段，这将影响到集群的性能以及可管理性。<br> ‒ 租户级别存在部分租户的业务量大，需要让这些大租户所在的 mongod 上，租户总数少一些，可以利用mongo shardTag + balancer机制来动态分配（无需代码改造）；<br> ‒ 单租户下的资源，此时需要结合业务考虑租户Id + () 多字段片建 变更片键维度或者考虑复合片键，需要改造代码；</li>
+<li>没有租户ID的表根据业务和改造代码，原则一致。保证数据库操作和Shard key耦合；</li>
+<li>Shard Key必须存在于索引中；</li>
+<li>注意范围分片和哈希分片无法解决的问题：</li>
+</ol>
+<ul>
+<li>Shard Key的取值范围太小，例如将数据中心作为Shard Key，由于数据中心通常不多，则分片效果不好。</li>
+<li>Shard Key中某个值的文档特别多，会导致单个chunk特别大（即 jumbo chunk），会影响chunk迁移及负载均衡。</li>
+<li>根据非Shard Key进行查询、更新操作都会变成scatter-gather查询，影响效率。</li>
+</ul>
+<ol start="8">
+<li>mongo &gt;&#x3D; 4.4, 支持ducument在sharded collection中的shard key &#x3D; null</li>
+<li>mongoDb query.explain() 有两个STAGE和shard相关，SHARD_MERGE 和 SHARDING_FILTER，SHARD_MERGE表示从各个Shard中合并数据，SHARDING_FILTER表示过滤文档中的孤立文档；</li>
+</ol>
+<h3 id="shard-key对操作的影响"><a href="#shard-key对操作的影响" class="headerlink" title="shard key对操作的影响"></a>shard key对操作的影响</h3><p><strong>查询请求</strong><br>查询请求不包含shard key，则必须将查询分发到所有的shard，然后合并查询结果返回给客户端；查询请求包含shard key，则直接根据shard key计算出需要查询的chunk，向对应的shard发送查询请求<br><strong>写请求</strong><br>写操作必须包含shard key，mongos根据shard key算出文档应该存储到哪个chunk，然后将写请求发送到chunk所在的shard。<br><strong>更新&#x2F;删除请求</strong><br>更新、删除请求的查询条件必须包含shard key或者_id，如果是包含shard key，则直接路由到指定的chunk，如果只包含_id，则需将请求发送至所有的shard。</p>
+<p><strong>代码改造</strong></p>
+<ul>
+<li>所有查询、修改、删除方法确认是否带上Shard Key；（业务上已经用多租户确保）</li>
+<li>所有的updateOne()和deleteOne()操作，即指定了multi: false 或者 One() 的操作，query中需要包含Shard Key或者_id属性，否则操作会返回error；</li>
+<li>findOneAndUpdate() 操作需要在条件中使用Shard key和指定的字段相等，比如{ key: value } { key: { $eq: value } }</li>
+<li>对于count()【不带任何查询条件】 替换成aggregate的count pipeline；</li>
+</ul>
+<h2 id="部署建议"><a href="#部署建议" class="headerlink" title="部署建议"></a>部署建议</h2><p>Sharding 机制本身不负责备份，建议使用Replica Set 來搭建 MongoDB Sharded Cluster。每个Shard使用PSS模式 + 多可用区数据库实例部署。</p>
+<p>多可用区数据库实例部署：每个shard部署为Replica Set，参考<a href="https://www.mongodb.com/docs/manual/tutorial/force-member-to-be-primary/">Force Member To Be Primary</a>，可以将当前可用区的mongod指定为Primary，将Replica Set集群分布到不同的可用区（Zone）上。实例的多可用区部署提供了高可用性和故障转移支持。</p>
+<p>shard相关添加shard，blancer，zones命令可参考<a href="https://www.mongodb.com/docs/manual/sharding/">MongoDb Shard</a></p>
+<h2 id="容量评估"><a href="#容量评估" class="headerlink" title="容量评估"></a>容量评估</h2><p>容量要提前做好规划，但是容量的规划需要知道业务的扩张速度，扩张速度这种事情又不是提前能计划好的。但是至少可以对维护的系统建立一个模型，知道多少机器，多少资源，能容纳多少容量。以下给出的对于mongo shard的容量建议：</p>
+<ul>
+<li><p>分片&amp; mongos 数量<br>数量上没有没有分片限制；分片数至少大于1，以支持数据分片功能；可以根据业务流量峰值qps，预计需要多少个分片量。<br>例如一个shard的最大QPS为M，一个mongos的最大QPS为Ms，业务需要的总QPS为Q，那么业务需要的shard和mongos数量按照以下公式计算：<br>numberOfShards &#x3D; Q&#x2F;M&#x2F;0.75 （假设负载水位线为75%）<br>numberOfMongos &#x3D; Q&#x2F;Ms&#x2F;0.75</p>
+</li>
+<li><p>shard 机器内存、磁盘评估<br>  mongodb 对内存消耗不高，百亿级以上 mongodb 集群最大内存基本上都是 64Gb。<br>  根据数据库磁盘消耗量评估分片，理想情况是总量 m 均匀的分布到 n 个分片上，n &#x2F; m 得出预计每个分片磁盘的消耗；</p>
+</li>
+<li><p>config &amp; mongos 机器内存、磁盘评估<br>由于 config server 只主要存储路由相关元数据，因此对磁盘、CUP、MEM 消耗都很低；mongos 代理只做路由转发只消耗 CPU，因此对内存和磁盘消耗都不高。<br>部署方式</p>
+</li>
+</ul>
+<h3 id="环境迁移为Mongo-Sharding部署"><a href="#环境迁移为Mongo-Sharding部署" class="headerlink" title="环境迁移为Mongo Sharding部署"></a>环境迁移为Mongo Sharding部署</h3><p>参考 <a href="https://www.mongodb.com/docs/manual/tutorial/convert-replica-set-to-replicated-shard-cluster/">convert-replica-set-to-replicated-shard-cluster</a></p>
+<p>引入Mongo Shard对于运维的挑战在于Day1和Day2+的变化，Day1在于部署环境引入Mongo Shard。Day2则要考虑主要要关注稳定性。如何合理地对线上mongodb进行横向地扩展，需要结合线上业务量的监控来对数据分片，比如当对一个已经存在的集合做分片时，这个过程会花费一些时间。分片是在后台进行的，所以其他操作不会被明显的受到影响。无论如何，将一个大的集合中的数据进行迁移&#x2F;平衡会占用很多时间。例如一个拥有10个shard的系统中，集合中90%的数据需要迁移到其他地方以达到平衡；也需要考虑如何量化「增加一个Shard」，未来也需要考虑自动扩展shard的方案。</p>
+<h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2><p>在一个 shard server 内部，MongoDB 还是会把数据分为 chunks, 每个 chunk 代表这个 shard server 内部一部分数据。当一个 chunk 的大小超过配置中的 chunk size 时，MongoDB 的后台进程会把这个 chunk 切分成更小的 chunk，从而避免 chunk 过大的情况.</p>
+<p>Balancing 在 MongoDB 中，balancer 是一个后台进程，负责 chunk 的迁移，从而均衡各个 shard server 的负载，系统初始 1 个 chunk，chunk size 默认值 64M, 生产库上选择适合业务的 chunk size是最好的，如果单位时间内的存储需求很大，设置更大的 chunk。MongoDB 会自动拆分和迁移 chunks。</p>
+<p>MongoDB Sharded cluster 的自动负载均衡目前是由 mongos 的后台线程来做的，并且每个集合同一时刻只能有一个迁移任务，负载均衡主要根据集合在各个 shard 上 chunk 的数量来决定的，相差超过一定阈值（跟 chunk 总数量相关）就会触发chunk迁移。</p>
+<p>负载均衡默认是开启的，为了避免 chunk 迁移影响到线上业务，可以通过设置迁移执行窗口，比如只允许凌晨2:00-6:00期间进行迁移。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">use config</span><br><span class="line">db.settings.update(</span><br><span class="line">   &#123; _id: &quot;balancer&quot; &#125;,</span><br><span class="line">   &#123; $set: &#123; activeWindow : &#123; start : &quot;02:00&quot;, stop : &quot;06:00&quot; &#125; &#125; &#125;,</span><br><span class="line">   &#123; upsert: true &#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，在进行 sharding 备份时（通过 mongos 或者单独备份config server 和所有 shard），需要停止负载均衡，以免备份出来的数据出现状态不一致问题。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sh.stopBalancer()</span><br></pre></td></tr></table></figure>
+<p>负载均衡影响及措施：</p>
+<ol>
+<li><p>move chunk期间进程异常关闭造成的迁移失败或清理迁移后的源端chunk失败，使得这部分记录在源端和目标端都存在，而在mongo分片集群的定义中，一个文档必须且只能属于一个chunk和shard。因此这部分文档被称作orphaned documents（孤立文档）。假如产生了孤立文档，mongodb提供了清理分片上所有孤立文档的方法，在每一个sharding节点上执行，方法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">var nextKey = &#123; &#125;;</span><br><span class="line">var result;</span><br><span class="line">while ( nextKey != null ) &#123;</span><br><span class="line">  result = db.adminCommand( &#123; cleanupOrphaned: &quot;test.user&quot;, startingFromKey: nextKey &#125; );</span><br><span class="line">  if (result.ok != 1)</span><br><span class="line">   print(&quot;Unable to complete at this time: failure or timeout.&quot;)</span><br><span class="line">  printjson(result);</span><br><span class="line">  nextKey = result.stoppedAtKey;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>move chunk过程中，源端的数据会在迁移结束、源端分片开始连接config数据库修改元数据，修改该chunk的所属分片才会进行异步地删除，此时对该表进行scatter-gather查询则会导致count的数量不准。<br>可以认为这是一种性能与效率上的折衷，因为在这种count场景下，大部分业务并不需要非常精准的count结果，而更强调”fast count”理念，即不用遍历数据，直接从元数据层面返回结果值；需要准确的count值，也完全可以用aggregate方法代替。（待验证）</p>
+</li>
+</ol>
+<p>因此对于均衡过程需要注意的点：</p>
+<ol>
+<li>同时追求效率和准确性，可以设置负载均衡窗口，在窗口以外禁止move chunk；</li>
+<li>强调数据准确性的场景，使用db.collection.aggregate()方法代替count（研发）；</li>
+<li>针对出现大量孤立文档的情况，做孤立文档清理；</li>
+</ol>
+<h3 id="关于jumbo-chunk及-chunk-size"><a href="#关于jumbo-chunk及-chunk-size" class="headerlink" title="关于jumbo chunk及 chunk size"></a>关于jumbo chunk及 chunk size</h3><p>jumbo chunk 的意思是chunk『太大或者文档太多』 且无法分裂。<br>If MongoDB cannot split a chunk that exceeds the specified chunk size or contains a number of documents that exceeds the max, MongoDB labels the chunk as jumbo.</p>
+<p>MongoDB 默认的 chunk size 为64MB，如果 chunk 超过64MB 并且不能分裂（比如所有文档 的 shard key 都相同），则会被标记为jumbo chunk ，balancer 不会迁移这样的 chunk，从而可能导致负载不均衡，应尽量避免。</p>
+<p>一旦出现了 jumbo chunk，如果对负载均衡要求不高，不去关注也没啥影响，并不会影响到数据的读写访问。如果一定要处理，可以尝试如下方法</p>
+<ol>
+<li>对 jumbo chunk 进行 split，一旦 split 成功，mongos 会自动清除 jumbo 标记。</li>
+<li>对于不可再分的 chunk，如果该 chunk 已不再是 jumbo chunk，可以尝试手动清除chunk 的 jumbo 标记（注意先备份下 config 数据库，以免误操作导致 config 库损坏）。</li>
+<li>最后的办法，调大 chunk size，当 chunk 大小不再超过 chunk size 时，jumbo 标记最终会被清理，但这个是治标不治本的方法，随着数据的写入仍然会再出现 jumbo chunk，根本的解决办法还是合理的规划 shard key。<br>关于 chunk size 如何设置的问题，绝大部分情况下，请直接使用默认 chunk size ，以下场景可能需要调整 chunk size（取值在1-1024之间）。</li>
+</ol>
+<ul>
+<li>迁移时 IO 负载太大，可以尝试设置更小的 chunk size；</li>
+<li>测试时，为了方便验证效果，设置较小的 chunk size；</li>
+<li>初始 chunk size 设置不合适，导致出现大量 jumbo chunk，影响负载均衡，此时可以尝试调大 chunk size；</li>
+<li>将『未分片的集合』转换为『分片集合』，如果集合容量太大，可能需要（数据量达到T 级别才有可能遇到）调大 chunk size 才能转换成功。参考Sharding Existing Collection Data Size</li>
+</ul>
+<h3 id="Pre-splitting"><a href="#Pre-splitting" class="headerlink" title="Pre-splitting"></a>Pre-splitting</h3><p>官方文档中对此有这样的一个描述：<br>Pre-splitting the chunk ranges in an empty sharded collection allows clients to insert data into an already partitioned collection.</p>
+<p>就是说 pre-splitting 预先创建一些 chunk 分布在空的 sharded collection，允许客户端插入数据到各个 chunk，空的 chunk 可以非常快速地进行 move 操作，从而可以分担读写压力到各个 shard，提升整个集群的吞吐量。</p>
+<p>一般来说，理想情况下 MongoDB 自动进行 chunk 的创建和迁移，无需用户介入，但是现实中必须需要介入。</p>
+<p>默认的 Range Shard Key 很难处理单调递增的 key，比如默认的 _id 实现 ObjectId 就是单调递增的，使用 _id 为 shard key，很容易使得新写入的数据都大部分集中在一个 Shard 上，导致写入存在热点，从而导致写入性能降低。<br>通过预先创建一定数量的空 chunk，并且分布均匀后，写入压力可以分摊到多个 shard 上，提升系统的读写性能，从而提升了系统的吞吐量。</p>
+<h3 id="Merge-Empty-Chunks"><a href="#Merge-Empty-Chunks" class="headerlink" title="Merge Empty Chunks"></a>Merge Empty Chunks</h3><p>Empty chunks 主要产生的原因：批量删除数据导致了 chunk 数据都被删除；索引中带有 expireAfterSeconds，即设置了过期时间，数据会在过期后被删除，导致部分 chunk 为空；通过 split 创建一些 empty chunk，但是没有插入数据。</p>
+<p>Empty chunks 主要会导致的问题就是数据无法均衡，MongoDB 自带的 balancer 是根据 chunk 的数目来进行均衡的，chunk 的大小由 chunk size 来进行限制。而我们需要的数据均衡是各个 shard 尽可能存有差不多大小的数据，empty chunk 是占了位置但是存储数据为 0，势必会导致数据不均衡，当 empty chunk 数量非常多的时候，会导致数据无法均衡，这个时候需要人工介入，清理 empty chunk。</p>
+<p>清理 empty chunk 的方法是通过 mergeChunk 的操作来将 empty chunk 与其他 chunk 合并来完成。</p>
+<p>常用命令</p>
+<ul>
+<li>查看 Sharding 配置和Chunk 信息<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sh.status()</span><br></pre></td></tr></table></figure></li>
+<li>数据库开启Sharding<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sh.enableSharding(&quot;&lt;DatabaseName&gt;&quot;)</span><br></pre></td></tr></table></figure></li>
+<li>增加 Shard Tag<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sh.addShardTag(&quot;&lt;ShardName&gt;&quot;, &quot;&lt;TagName&gt;&quot;)</span><br></pre></td></tr></table></figure></li>
+<li>collection 开启 Shard<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sh.shardCollection(&quot;&lt;DatabaseName&gt;.&lt;CollectionName&gt;&quot;,&#123;&lt;Shard key&gt; : &lt;Shard Strategy&gt;&#125;)</span><br></pre></td></tr></table></figure></li>
+<li>collection 停止自动 balance<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sh.disableBalancing(&quot;&lt;DatabaseName&gt;.&lt;CollectionName&gt;&quot;)</span><br></pre></td></tr></table></figure></li>
+<li>指定 collection 删除 Tag Range<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sh.removeTagRange(&quot;&lt;DatabaseName&gt;.&lt;CollectionName&gt;&quot;, &#123; &lt;Min Shard Range&gt; &#125;, &#123; &lt;Max Shard Range&gt; &#125;, &quot;&lt;TagName&gt;&quot;)</span><br></pre></td></tr></table></figure></li>
+<li>指定collection 删除 Tag Range<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sh.addTagRange(&quot;&lt;DatabaseName&gt;.&lt;CollectionName&gt;&quot;, &#123; &lt;Min Shard Range&gt; &#125;, &#123; &lt;Max Shard Range&gt; &#125;, &quot;&lt;TagName&gt;&quot;)</span><br></pre></td></tr></table></figure></li>
+<li>collection 开启自动 balance<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sh.enableBalancing(&quot;&lt;DatabaseName&gt;.&lt;CollectionName&gt;&quot;)</span><br></pre></td></tr></table></figure></li>
+<li>修改 Chunk Size<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">use config</span><br><span class="line">db.settings.updateOne(</span><br><span class="line">   &#123; _id: &quot;chunksize&quot; &#125;,</span><br><span class="line">   &#123; $set: &#123; _id: &quot;chunksize&quot;, value: &lt;MB&gt; &#125; &#125;,</span><br><span class="line">   &#123; upsert: true &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure></li>
+<li>设置balance 窗口<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">use config</span><br><span class="line">db.settings.update(</span><br><span class="line">   &#123; _id: &quot;balancer&quot; &#125;,</span><br><span class="line">   &#123; $set: &#123; activeWindow : &#123; start : &quot;02:00&quot;, stop : &quot;06:00&quot; &#125; &#125; &#125;,</span><br><span class="line">   &#123; upsert: true &#125;</span><br></pre></td></tr></table></figure>
+‒查看单 collection 数据分布<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">db.&lt;collection&gt;.getShardDistribution()</span><br></pre></td></tr></table></figure>
+备份<br>mongodb 官网提到 mongodump 和 mongorestore 不适用于4.2+的版本的mongo分片集群，因为mongodump操作不能保证存在分片间的事务的原子性，mongodb 官方提供的服务支持对mongodb shard进行监控和备份，MongoDB Atlas、MongoDB Cloud Manager、MongoDB Ops Manager，仅支持企业版.<br>Percona Backup for MongoDB (PBM)是一种分布式、低影响的解决方案，用于实现MongoDB分片集群和副本集的一致备份：pbm，使用可以参考官方文档和 <a href="https://www.cndba.cn/cndba/dave/article/107975">MongoDB 分片集群（Shard Cluster）一致性备份工具 PBM 使用说明</a></li>
+</ul>
+<h2 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q &amp; A"></a>Q &amp; A</h2><ol>
+<li>有业务上定时清理导致出现 empty chunk</li>
+</ol>
+<p>这种原因是业务上按照时间清理数据，shard key 中包含时间。而清理数据后 MongoDB 不会自动清理 empty chunk，而 empty chunk 在 balancer 中也是会被计数，影响数据迁移。<br>解决方案：用脚本统一清理空 chunk</p>
+<ol start="2">
+<li>索引和分片键有什么关系？</li>
+</ol>
+<p>MongoDB 索引不是全局索引，而存在各个 Shard 中。而开启 Shard MongoDB 会要求索引中必须带有分片键，且分片键必须分布在索引的前缀中。</p>
+]]></content>
+      <categories>
+        <category>tech</category>
+      </categories>
+      <tags>
+        <tag>MongoDB</tag>
       </tags>
   </entry>
 </search>

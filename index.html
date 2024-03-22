@@ -207,7 +207,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2024-03-22 16:31:00 / Modified: 18:15:57" itemprop="dateCreated datePublished" datetime="2024-03-22T16:31:00+08:00">2024-03-22</time>
+              <time title="Created: 2024-03-22 16:31:00 / Modified: 18:17:46" itemprop="dateCreated datePublished" datetime="2024-03-22T16:31:00+08:00">2024-03-22</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -240,26 +240,102 @@
 <p>如果我们想要在 main.py 中使用的话，那么可以直接 import，这种方式也称之为“模块导入”。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import packs</span><br><span class="line"></span><br><span class="line">packs.one.One()</span><br></pre></td></tr></table></figure>
 <p>运行后就会打印 module one，另外也可以看到在 packs 目录下生成一个 <strong>pycache</strong> 的新目录，这是编译后中间文件，可以提升模块载入速度。</p>
-<p>除了这种全局导入外，还可以在局部作用域导入。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def main():</span><br><span class="line">    from packs.one import One</span><br><span class="line">    One()</span><br><span class="line"></span><br><span class="line">main()</span><br></pre></td></tr></table></figure>
-<h3 id="init-文件"><a href="#init-文件" class="headerlink" title="init 文件"></a>init 文件</h3><p><strong>init</strong>.py 每当导入当前包的模块的时候就会运行一次。<br>我们可以再 <strong>init</strong>.py 输入导出的模块，外部使用的就不需要很长的导入路径了。</p>
-<p>修改 packs&#x2F;__init__py 为如下所示：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from .one import One</span><br></pre></td></tr></table></figure>
-<p>print(“packs one imported”)<br>那么在 main.py 中就可以这样使用：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from packs import One</span><br></pre></td></tr></table></figure>
-<p>One()<br>或者这样子：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import packs</span><br><span class="line"></span><br><span class="line">packs.One()</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/post/55c2460.html#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
 
-<h3 id="相对路径和绝对路径引用"><a href="#相对路径和绝对路径引用" class="headerlink" title="相对路径和绝对路径引用"></a>相对路径和绝对路径引用</h3><p>这种带有相对路径的导入路径 from .XXX，这种代表从当前的 XXX 模块中导入名称。<br>如果想要在当前模块中使用上一层的 packs&#x2F;one.py 就可以使用 from ..one import One 的方式。</p>
-<p>以此类推，那么 … 代表更上一级。</p>
-<p>但是这种方式还是有问题的，如果项目深度太大就容易写太多 .，还有一种方式就是绝对路径引用，这里的绝对路径是指相对项目根目录而言的。</p>
-<h3 id="模块搜索顺序"><a href="#模块搜索顺序" class="headerlink" title="模块搜索顺序"></a>模块搜索顺序</h3><p>自己写的包名肯定可能和第三方或者标准库同名，不过这种同名通常没有问题。因为 python 会优先在当前目录搜索然后在环境变量的搜索路径，之后才是标准库和第三方包。</p>
-<p>这个和 linux $PATH 的环境变量一样，按照顺序来搜索。一旦导入每个模块就有全局的命名空间，第二次再次加载就会使用缓存。</p>
-<p>这个路径搜索方式和 nodejs 有些区别，nodejs 是一旦同名，优先标准库，如果自定义一个 http 模块，那么永远不会被加载。</p>
-<h3 id="pip-包管理工具"><a href="#pip-包管理工具" class="headerlink" title="pip 包管理工具"></a>pip 包管理工具</h3><p>包管理</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 安装</span><br><span class="line"># 最新版本</span><br><span class="line">pip install Django</span><br><span class="line"># 指定版本号</span><br><span class="line">pip install Django==2.0.0</span><br><span class="line"># 最小版本</span><br><span class="line">pip install &#x27;Django&gt;=2.0.0&#x27;</span><br><span class="line"></span><br><span class="line"># 升级包</span><br><span class="line">pip install --upgrade Django</span><br><span class="line"># 卸载包</span><br><span class="line">pip uninstall SomePackage</span><br><span class="line"># 搜索包</span><br><span class="line">pip search SomePackage</span><br><span class="line"># 显示安装包信息</span><br><span class="line">pip show</span><br><span class="line"># 查看指定包的详细信息</span><br><span class="line">pip show -f SomePackage</span><br><span class="line"># 列出已安装的包</span><br><span class="line">pip list</span><br><span class="line"># 查看可升级的包</span><br><span class="line">pip list -o</span><br></pre></td></tr></table></figure>
-<p>包依赖锁</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip freeze &gt; requirement.txt # 锁版本</span><br><span class="line">pip install -r requirement.txt # 指定安装版本</span><br><span class="line">pip install --user install black # 安装到用户级目录</span><br></pre></td></tr></table></figure>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/post/dc97195f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/IMG_8982.JPG">
+      <meta itemprop="name" content="rin">
+      <meta itemprop="description" content="AN IDIOT SANDWITCH">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="rin's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/post/dc97195f.html" class="post-title-link" itemprop="url">在项目中引入 MongoDB Sharding</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-02-03 00:00:00" itemprop="dateCreated datePublished" datetime="2023-02-03T00:00:00+08:00">2023-02-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-03-22 21:23:54" itemprop="dateModified" datetime="2024-03-22T21:23:54+08:00">2024-03-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>之前在项目中调研和引入了 MongoDB Sharding，在此整理一下笔记和文档。</p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><h2 id="原因和解决目标"><a href="#原因和解决目标" class="headerlink" title="原因和解决目标"></a>原因和解决目标</h2><p>目前项目利用 Mongo Replication 保证了数据库中的全部数据都会有多份拷贝，保证了冗余和高可用，但单台机器的 CPU、内存、磁盘的限制会达到数据库的瓶颈，大部分的读写瓶颈也阻塞在一台服务器，出现系统无法支持更多吞吐及海量数据的存储性能等问题。用户的数据量永远在增加，而机器提升性能有瓶颈。因此考虑引入 MongoDB Sharding，「横向」扩展来解决目前项目中遇到的问题。MongoDB Sharding 本质是用多台机器来存储数据，每个机器仅存储部分的数据。</p>
+<p>实际上生产环境已经遇到的问题 1) 生产环境存在〇〇表由于业务高频读写产生瓶颈 2）〇〇数据存储达到 TB 级别，存储量为百亿级别</p>
+<p>Sharding的优势：</p>
+<ul>
+<li>读写方面：sharding将读写负载均匀到各个shard，当机器的读写量达到当前部署模式的瓶颈时可以通过水平扩展Shard来负载读写；</li>
+<li>扩容方面：每个Shard保存一部分数据，可以通过增加Shard来扩容，理论上mongo可以利用扩展shard存储无限的数据；<a target="_blank" rel="noopener" href="https://www.mongodb.com/docs/manual/core/sharded-cluster-requirements/">Shard key &amp; max size of collection</a></li>
+<li>高可用方面：即便某个Shard不可用了，整个集群也可以对外提供服务；<br>Mongo Shard本身不支持备份，因此考虑使用Replica Set來搭建 MongoDB Sharded Cluster，即每个Shard部署为Replica Set。
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/post/dc97195f.html#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -593,7 +669,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -606,7 +682,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
