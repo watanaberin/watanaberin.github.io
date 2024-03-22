@@ -205,7 +205,7 @@
 <li><p>config &amp; mongos 机器内存、磁盘评估<br>由于 config server 只主要存储路由相关元数据，因此对磁盘、CUP、MEM 消耗都很低；mongos 代理只做路由转发只消耗 CPU，因此对内存和磁盘消耗都不高。<br>部署方式</p>
 </li>
 </ul>
-<h3 id="环境迁移为Mongo-Sharding部署"><a href="#环境迁移为Mongo-Sharding部署" class="headerlink" title="环境迁移为Mongo Sharding部署"></a>环境迁移为Mongo Sharding部署</h3><p>参考 <a href="https://www.mongodb.com/docs/manual/tutorial/convert-replica-set-to-replicated-shard-cluster/">convert-replica-set-to-replicated-shard-cluster</a></p>
+<h2 id="Upgrade"><a href="#Upgrade" class="headerlink" title="Upgrade"></a>Upgrade</h2><p>参考 <a href="https://www.mongodb.com/docs/manual/tutorial/convert-replica-set-to-replicated-shard-cluster/">convert-replica-set-to-replicated-shard-cluster</a></p>
 <p>引入Mongo Shard对于运维的挑战在于Day1和Day2+的变化，Day1在于部署环境引入Mongo Shard。Day2则要考虑主要要关注稳定性。如何合理地对线上mongodb进行横向地扩展，需要结合线上业务量的监控来对数据分片，比如当对一个已经存在的集合做分片时，这个过程会花费一些时间。分片是在后台进行的，所以其他操作不会被明显的受到影响。无论如何，将一个大的集合中的数据进行迁移&#x2F;平衡会占用很多时间。例如一个拥有10个shard的系统中，集合中90%的数据需要迁移到其他地方以达到平衡；也需要考虑如何量化「增加一个Shard」，未来也需要考虑自动扩展shard的方案。</p>
 <h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2><p>在一个 shard server 内部，MongoDB 还是会把数据分为 chunks, 每个 chunk 代表这个 shard server 内部一部分数据。当一个 chunk 的大小超过配置中的 chunk size 时，MongoDB 的后台进程会把这个 chunk 切分成更小的 chunk，从而避免 chunk 过大的情况.</p>
 <p>Balancing 在 MongoDB 中，balancer 是一个后台进程，负责 chunk 的迁移，从而均衡各个 shard server 的负载，系统初始 1 个 chunk，chunk size 默认值 64M, 生产库上选择适合业务的 chunk size是最好的，如果单位时间内的存储需求很大，设置更大的 chunk。MongoDB 会自动拆分和迁移 chunks。</p>
@@ -229,7 +229,7 @@
 <li>强调数据准确性的场景，使用db.collection.aggregate()方法代替count（研发）；</li>
 <li>针对出现大量孤立文档的情况，做孤立文档清理；</li>
 </ol>
-<h3 id="关于jumbo-chunk及-chunk-size"><a href="#关于jumbo-chunk及-chunk-size" class="headerlink" title="关于jumbo chunk及 chunk size"></a>关于jumbo chunk及 chunk size</h3><p>jumbo chunk 的意思是chunk『太大或者文档太多』 且无法分裂。<br>If MongoDB cannot split a chunk that exceeds the specified chunk size or contains a number of documents that exceeds the max, MongoDB labels the chunk as jumbo.</p>
+<h2 id="MongoDB-Shard-引入的概念"><a href="#MongoDB-Shard-引入的概念" class="headerlink" title="MongoDB Shard 引入的概念"></a>MongoDB Shard 引入的概念</h2><h3 id="关于jumbo-chunk及-chunk-size"><a href="#关于jumbo-chunk及-chunk-size" class="headerlink" title="关于jumbo chunk及 chunk size"></a>关于jumbo chunk及 chunk size</h3><p>jumbo chunk 的意思是chunk『太大或者文档太多』 且无法分裂。<br>If MongoDB cannot split a chunk that exceeds the specified chunk size or contains a number of documents that exceeds the max, MongoDB labels the chunk as jumbo.</p>
 <p>MongoDB 默认的 chunk size 为64MB，如果 chunk 超过64MB 并且不能分裂（比如所有文档 的 shard key 都相同），则会被标记为jumbo chunk ，balancer 不会迁移这样的 chunk，从而可能导致负载不均衡，应尽量避免。</p>
 <p>一旦出现了 jumbo chunk，如果对负载均衡要求不高，不去关注也没啥影响，并不会影响到数据的读写访问。如果一定要处理，可以尝试如下方法</p>
 <ol>
