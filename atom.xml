@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-03-22T10:17:46.087Z</updated>
+  <updated>2024-03-25T07:28:33.721Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Prompt 优化指北</title>
+    <link href="http://example.com/post/2dd10418.html"/>
+    <id>http://example.com/post/2dd10418.html</id>
+    <published>2024-03-25T07:28:00.000Z</published>
+    <updated>2024-03-25T07:28:33.721Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    <category term="tech" scheme="http://example.com/categories/tech/"/>
+    
+    
+    <category term="prompt engineering" scheme="http://example.com/tags/prompt-engineering/"/>
+    
+    <category term="LLM" scheme="http://example.com/tags/LLM/"/>
+    
+  </entry>
   
   <entry>
     <title>Python模块和包管理</title>

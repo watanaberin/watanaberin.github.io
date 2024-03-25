@@ -182,6 +182,125 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/post/2dd10418.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/IMG_8982.JPG">
+      <meta itemprop="name" content="rin">
+      <meta itemprop="description" content="AN IDIOT SANDWITCH">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="rin's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/post/2dd10418.html" class="post-title-link" itemprop="url">Prompt 优化指北</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-03-25 15:28:00 / Modified: 15:28:33" itemprop="dateCreated datePublished" datetime="2024-03-25T15:28:00+08:00">2024-03-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>这些技巧和优化也很适合放到模型里面来帮助用户调整 prompt。</p>
+<h2 id="编写-Prompt-的技巧"><a href="#编写-Prompt-的技巧" class="headerlink" title="编写 Prompt 的技巧"></a>编写 Prompt 的技巧</h2><ol>
+<li><p>将不同的指令、上下文、输入隔开，避免意外的混淆。防止提示词注入（Prompt Rejection）。</p>
+</li>
+<li><p>寻求格式化的输出，适合在代码中进一步解析和处理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">f&quot;&quot;&quot;以 JSON 格式提供，其中包含以下键:book_id、title、author、genre。&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">&lt;!--more--&gt;</span><br><span class="line"></span><br><span class="line">f&quot;&quot;&quot;执行以下操作：</span><br><span class="line">1-用一句话概括下面用三个反引号括起来的文本。</span><br><span class="line">2-将摘要翻译成英语。</span><br><span class="line">3-在英语摘要中列出每个人名。</span><br><span class="line">4-输出一个 JSON 对象，其中包含以下键：english_summary，num_names。</span><br><span class="line"></span><br><span class="line">请用换行符分隔您的答案。&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">请使用以下格式：</span><br><span class="line">文本：&lt;要总结的文本&gt;</span><br><span class="line">摘要：&lt;摘要&gt;</span><br><span class="line">翻译：&lt;摘要的翻译&gt;</span><br><span class="line">名称：&lt;英语摘要中的名称列表&gt;</span><br><span class="line">输出 JSON：&lt;带有 English_summary 和 num_names 的 JSON&gt;</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>要求模型检查是否满足条件，我们可以告诉模型先检查这些假设，如果不满足，则会指出并停止执行后续的完整流程。</p>
+</li>
+<li><p>“Few-shot” prompting，即在要求模型执行实际任务之前，给模型一两个已完成的样例，让模型了解我们的要求和期望的输出样式。</p>
+</li>
+<li><p>确切指定了输出的格式 VS 给出输出步骤 step by step</p>
+</li>
+<li><p>减少幻觉，可以先让语言模型直接引用文本中的原句，然后再进行解答。这可以追踪信息来源，降低虚假内容的风险。</p>
+</li>
+</ol>
+<h2 id="调整-amp-优化方向"><a href="#调整-amp-优化方向" class="headerlink" title="调整 &amp; 优化方向"></a>调整 &amp; 优化方向</h2><p>迭代: 尝试 - 分析 - 优化</p>
+<ol>
+<li><p>字数。语言模型在计算和判断文本长度时依赖于分词器，而分词器在字符统计方面不具备完美精度。目前存在多种方法可以尝试控制语言模型生成输出的长度，比如指定语句数、词数、汉字数等。</p>
+</li>
+<li><p>根据不同目标受众关注不同的方面，输出风格和内容上都适合的文本。(找个重点让大模型写)</p>
+</li>
+<li><p>temperature 可参数以控制语言模型生成文本的随机性</p>
+</li>
+</ol>
+<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><ol>
+<li>推断</li>
+<li>文本概括</li>
+<li>文本转换能力；多语言翻译、拼写纠正、语法调整、格式转换等不同类型的文本转换任务</li>
+<li>文本扩展</li>
+<li>聊天机器人</li>
+</ol>
+<h2 id="Development-base-on-ChatGPT"><a href="#Development-base-on-ChatGPT" class="headerlink" title="Development base on ChatGPT"></a>Development base on ChatGPT</h2><ol>
+<li><p>token 限制是输入的 Prompt 和输出的 completion 的 token 数之和，因此输入的 Prompt 越长，能输出的 completion 的上限就越低。 -&gt; 限制输出字数。</p>
+</li>
+<li><p>“#” 是一个理想的分隔符，因为它可以被视为一个单独的 token。使用系统消息（system_message）作为整个系统的全局指导，并选择使用 “#” 作为分隔符。</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://platform.openai.com/docs/guides/moderation">OpenAI 的审核函数接口</a></p>
+</li>
+<li><p>防止 prompt 注入</p>
+</li>
+</ol>
+<ul>
+<li>在系统消息中使用分隔符（delimiter）和明确的指令。</li>
+<li>额外添加提示，询问用户是否尝试进行 Prompt 注入。</li>
+</ul>
+<ol start="5">
+<li><p>“内心独白”技巧。利用 ChatGPT 进行推理的时候，进行详细的推理得出结论，仅呈现对用户有价值的输出，不展示完整的推理过程。</p>
+</li>
+<li><p>将复杂任务分解为多个简单Prompt：链式提示</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://example.com/post/55c2460.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -669,7 +788,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -682,7 +801,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
