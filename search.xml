@@ -284,7 +284,10 @@
   <entry>
     <title>Prompt 优化指北</title>
     <url>/post/2dd10418.html</url>
-    <content><![CDATA[<p>这些技巧和优化也很适合放到模型里面来帮助用户调整 prompt。</p>
+    <content><![CDATA[<h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>本质就是把一个复杂的任务拆成科学合理的步骤，并且让前面每一步的结果都成为后面步骤的基础，所有步骤合并在一起得到最终的结果，而不要指望一步得到结果</li>
+<li>即使在 Prompt 里面指明了步骤，但是如果没有将步骤打印出来，那么也是没有效果的。（比如翻译并基于意译进行二次纠正，需要在 prompt 中指示打印出一开始的「意译」的内容）</li>
+</ul>
 <h2 id="编写-Prompt-的技巧"><a href="#编写-Prompt-的技巧" class="headerlink" title="编写 Prompt 的技巧"></a>编写 Prompt 的技巧</h2><ol>
 <li>将不同的指令、上下文、输入隔开，避免意外的混淆。防止提示词注入（Prompt Rejection）。</li>
 </ol>

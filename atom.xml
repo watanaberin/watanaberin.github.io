@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-03-25T07:31:31.579Z</updated>
+  <updated>2024-03-26T06:13:01.942Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,10 +21,13 @@
     <link href="http://example.com/post/2dd10418.html"/>
     <id>http://example.com/post/2dd10418.html</id>
     <published>2024-03-25T07:28:00.000Z</published>
-    <updated>2024-03-25T07:31:31.579Z</updated>
+    <updated>2024-03-26T06:13:01.942Z</updated>
     
     
-    <summary type="html">&lt;p&gt;这些技巧和优化也很适合放到模型里面来帮助用户调整 prompt。&lt;/p&gt;
+    <summary type="html">&lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;本质就是把一个复杂的任务拆成科学合理的步骤，并且让前面每一步的结果都成为后面步骤的基础，所有步骤合并在一起得到最终的结果，而不要指望一步得到结果&lt;/li&gt;
+&lt;li&gt;即使在 Prompt 里面指明了步骤，但是如果没有将步骤打印出来，那么也是没有效果的。（比如翻译并基于意译进行二次纠正，需要在 prompt 中指示打印出一开始的「意译」的内容）&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h2 id=&quot;编写-Prompt-的技巧&quot;&gt;&lt;a href=&quot;#编写-Prompt-的技巧&quot; class=&quot;headerlink&quot; title=&quot;编写 Prompt 的技巧&quot;&gt;&lt;/a&gt;编写 Prompt 的技巧&lt;/h2&gt;&lt;ol&gt;
 &lt;li&gt;将不同的指令、上下文、输入隔开，避免意外的混淆。防止提示词注入（Prompt Rejection）。&lt;/li&gt;
 &lt;/ol&gt;</summary>
