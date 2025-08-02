@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2025-08-02T15:32:46.899Z</updated>
+  <updated>2025-08-02T15:43:53.586Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>一发多巴胺</title>
+    <link href="http://example.com/post/f4d8687.html"/>
+    <id>http://example.com/post/f4d8687.html</id>
+    <published>2025-08-02T15:36:32.964Z</published>
+    <updated>2025-08-02T15:43:53.586Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>最近看的电影</title>
@@ -42,16 +63,10 @@
     <link href="http://example.com/post/4f67f59b.html"/>
     <id>http://example.com/post/4f67f59b.html</id>
     <published>2025-08-02T14:43:36.597Z</published>
-    <updated>2025-08-02T15:04:14.045Z</updated>
+    <updated>2025-08-02T15:35:33.680Z</updated>
     
     
-      
-      
-        
-        
-    <summary type="html"></summary>
-        
-      
+    <summary type="html">&lt;p&gt;虽然我很多事情会问 AI，但是昨天我在抱怨这个工程的代码很难调试的时候，</summary>
     
     
     
