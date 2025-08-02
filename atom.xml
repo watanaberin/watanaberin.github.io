@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-03-26T06:13:01.942Z</updated>
+  <updated>2025-08-02T14:38:24.321Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,111 +17,11 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Prompt 优化指北</title>
-    <link href="http://example.com/post/2dd10418.html"/>
-    <id>http://example.com/post/2dd10418.html</id>
-    <published>2024-03-25T07:28:00.000Z</published>
-    <updated>2024-03-26T06:13:01.942Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;本质就是把一个复杂的任务拆成科学合理的步骤，并且让前面每一步的结果都成为后面步骤的基础，所有步骤合并在一起得到最终的结果，而不要指望一步得到结果&lt;/li&gt;
-&lt;li&gt;即使在 Prompt 里面指明了步骤，但是如果没有将步骤打印出来，那么也是没有效果的。（比如翻译并基于意译进行二次纠正，需要在 prompt 中指示打印出一开始的「意译」的内容）&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;编写-Prompt-的技巧&quot;&gt;&lt;a href=&quot;#编写-Prompt-的技巧&quot; class=&quot;headerlink&quot; title=&quot;编写 Prompt 的技巧&quot;&gt;&lt;/a&gt;编写 Prompt 的技巧&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;将不同的指令、上下文、输入隔开，避免意外的混淆。防止提示词注入（Prompt Rejection）。&lt;/li&gt;
-&lt;/ol&gt;</summary>
-    
-    
-    
-    <category term="tech" scheme="http://example.com/categories/tech/"/>
-    
-    
-    <category term="prompt engineering" scheme="http://example.com/tags/prompt-engineering/"/>
-    
-    <category term="LLM" scheme="http://example.com/tags/LLM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Python模块和包管理</title>
-    <link href="http://example.com/post/55c2460.html"/>
-    <id>http://example.com/post/55c2460.html</id>
-    <published>2024-03-22T08:31:00.000Z</published>
-    <updated>2024-03-22T10:17:46.087Z</updated>
-    
-    
-    <summary type="html">&lt;h3 id=&quot;&quot;&gt;&lt;a href=&quot;#&quot; class=&quot;headerlink&quot; title=&quot;&quot;&gt;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在 Python 中每一个 .py 都可以视作一个模块（module），而每一个包含 &lt;strong&gt;init&lt;/strong&gt;.py 的目录则可以视作包（packge）。&lt;/p&gt;
-&lt;p&gt;在 one.py 中简单定义了一个函数 One:&lt;/p&gt;
-&lt;figure class=&quot;highlight plaintext&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;def One():&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    print(&amp;quot;module one&amp;quot;)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;def OneOne():&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    print(&amp;quot;module one/one&amp;quot;)&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;如果我们想要在 main.py 中使用的话，那么可以直接 import，这种方式也称之为“模块导入”。&lt;/p&gt;
-&lt;figure class=&quot;highlight plaintext&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;import packs&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;packs.one.One()&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;运行后就会打印 module one，另外也可以看到在 packs 目录下生成一个 &lt;strong&gt;pycache&lt;/strong&gt; 的新目录，这是编译后中间文件，可以提升模块载入速度。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="tech" scheme="http://example.com/categories/tech/"/>
-    
-    <category term="language" scheme="http://example.com/categories/tech/language/"/>
-    
-    
-    <category term="python" scheme="http://example.com/tags/python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>在项目中引入 MongoDB Sharding</title>
-    <link href="http://example.com/post/dc97195f.html"/>
-    <id>http://example.com/post/dc97195f.html</id>
-    <published>2023-06-02T16:00:00.000Z</published>
-    <updated>2024-03-22T13:29:58.929Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;之前在项目中调研和引入了 MongoDB Sharding，在此整理一下笔记和文档。&lt;/p&gt;
-&lt;h1 id=&quot;介绍&quot;&gt;&lt;a href=&quot;#介绍&quot; class=&quot;headerlink&quot; title=&quot;介绍&quot;&gt;&lt;/a&gt;介绍&lt;/h1&gt;&lt;h2 id=&quot;原因和解决目标&quot;&gt;&lt;a href=&quot;#原因和解决目标&quot; class=&quot;headerlink&quot; title=&quot;原因和解决目标&quot;&gt;&lt;/a&gt;原因和解决目标&lt;/h2&gt;&lt;p&gt;目前项目利用 Mongo Replication 保证了数据库中的全部数据都会有多份拷贝，保证了冗余和高可用，但单台机器的 CPU、内存、磁盘的限制会达到数据库的瓶颈，大部分的读写瓶颈也阻塞在一台服务器，出现系统无法支持更多吞吐及海量数据的存储性能等问题。用户的数据量永远在增加，而机器提升性能有瓶颈。因此考虑引入 MongoDB Sharding，「横向」扩展来解决目前项目中遇到的问题。MongoDB Sharding 本质是用多台机器来存储数据，每个机器仅存储部分的数据。&lt;/p&gt;
-&lt;p&gt;实际上生产环境已经遇到的问题 1) 生产环境存在〇〇表由于业务高频读写产生瓶颈 2）〇〇数据存储达到 TB 级别，存储量为百亿级别&lt;/p&gt;
-&lt;p&gt;Sharding的优势：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;读写方面：sharding将读写负载均匀到各个shard，当机器的读写量达到当前部署模式的瓶颈时可以通过水平扩展Shard来负载读写；&lt;/li&gt;
-&lt;li&gt;扩容方面：每个Shard保存一部分数据，可以通过增加Shard来扩容，理论上mongo可以利用扩展shard存储无限的数据；&lt;a href=&quot;https://www.mongodb.com/docs/manual/core/sharded-cluster-requirements/&quot;&gt;Shard key &amp;amp; max size of collection&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;高可用方面：即便某个Shard不可用了，整个集群也可以对外提供服务；&lt;br&gt;Mongo Shard本身不支持备份，因此考虑使用Replica Set來搭建 MongoDB Sharded Cluster，即每个Shard部署为Replica Set。</summary>
-    
-    
-    
-    <category term="tech" scheme="http://example.com/categories/tech/"/>
-    
-    
-    <category term="MongoDB" scheme="http://example.com/tags/MongoDB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>我的Mac上安装了什么软体</title>
-    <link href="http://example.com/post/efa67fef.html"/>
-    <id>http://example.com/post/efa67fef.html</id>
-    <published>2023-01-25T16:00:00.000Z</published>
-    <updated>2023-07-04T10:32:44.347Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;这些软体也许我是非它们不可，&lt;br&gt;&lt;a href=&quot;https://www.sublimetext.com/&quot;&gt;Sublime Text&lt;/a&gt;(文本编辑器)、&lt;a href=&quot;https://apps.apple.com/us/app/pure-paste/id1611378436?mt=12&quot;&gt;Pure Paste&lt;/a&gt;(复制文本时清除格式)、&lt;a href=&quot;https://apps.apple.com/us/app/moom/id419330170?mt=12&quot;&gt;Moom&lt;/a&gt;(窗口布局)、&lt;a href=&quot;https://www.alfredapp.com/&quot;&gt;Alfred&lt;/a&gt;(基于workflow的效率工具)、&lt;a href=&quot;https://github.com/oldj/SwitchHosts&quot;&gt;SwitchHost&lt;/a&gt;(切换hosts文件)、&lt;a href=&quot;https://www.snipaste.com/&quot;&gt;Snipaste&lt;/a&gt;(屏幕截图工具)、&lt;a href=&quot;https://www.renfei.org/snippets-lab/&quot;&gt;SnippetsLab&lt;/a&gt;(代码片段工具)、&lt;a href=&quot;https://calibre-ebook.com/&quot;&gt;Calibre&lt;/a&gt;(电子书管理工具)、&lt;a href=&quot;https://apps.apple.com/cn/app/runcat/id1429033973?mt=12&quot;&gt;RunCat&lt;/a&gt;(菜单栏挂件 &amp;amp; 系统用量工具)、&lt;a href=&quot;https://obsidian.md/&quot;&gt;Obisidian&lt;/a&gt;(笔记工具)、&lt;a href=&quot;https://www.spotify.com/us/download/mac/&quot;&gt;Spotify&lt;/a&gt;(🎵)。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="productivity" scheme="http://example.com/categories/productivity/"/>
-    
-    
-    <category term="Mac" scheme="http://example.com/tags/Mac/"/>
-    
-    <category term="software" scheme="http://example.com/tags/software/"/>
-    
-  </entry>
-  
-  <entry>
     <title>学外语如何毁了我</title>
     <link href="http://example.com/post/2369de45.html"/>
     <id>http://example.com/post/2369de45.html</id>
-    <published>2023-01-24T16:00:00.000Z</published>
-    <updated>2023-07-04T10:32:44.342Z</updated>
+    <published>2023-01-24T23:00:00.000Z</published>
+    <updated>2025-08-02T14:38:24.321Z</updated>
     
     
     <summary type="html">&lt;p&gt;原文 from youtube &lt;a href=&quot;https://www.youtube.com/watch?v=ZZ_4gzoDDAE&quot;&gt;学外语如何毁了我&lt;/a&gt;&lt;/p&gt;
@@ -129,38 +29,6 @@
     
     
     
-    <category term="language" scheme="http://example.com/categories/language/"/>
-    
-    
-    <category term="语言" scheme="http://example.com/tags/%E8%AF%AD%E8%A8%80/"/>
-    
-    <category term="youtube" scheme="http://example.com/tags/youtube/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Centos单机搭建Kafka</title>
-    <link href="http://example.com/post/911f542f.html"/>
-    <id>http://example.com/post/911f542f.html</id>
-    <published>2023-01-02T16:00:00.000Z</published>
-    <updated>2023-07-04T10:32:44.351Z</updated>
-    
-    
-    <summary type="html">&lt;h3 id=&quot;JAVA-环境-（JDK-1-8）&quot;&gt;&lt;a href=&quot;#JAVA-环境-（JDK-1-8）&quot; class=&quot;headerlink&quot; title=&quot;JAVA 环境 （JDK 1.8）&quot;&gt;&lt;/a&gt;JAVA 环境 （JDK 1.8）&lt;/h3&gt;&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;下载安装包&lt;/p&gt;
-&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;wget --no-cookies --no-check-certificate --header &lt;span class=&quot;string&quot;&gt;&amp;quot;Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie&amp;quot;&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&amp;quot;http://download.oracle.com/otn-pub/java/jdk/8u141-b15/336fa29ff2bb4ef291e347e091f7f4a7/jdk-8u141-linux-x64.tar.gz&amp;quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;创建安装目录&lt;/p&gt;
-&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;mkdir&lt;/span&gt; /usr/local/java/&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;解压至安装目录&lt;/p&gt;
-&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;tar -zxvf jdk-8u171-linux-x64.tar.gz -C /usr/local/java/&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;</summary>
-    
-    
-    
-    <category term="tech" scheme="http://example.com/categories/tech/"/>
-    
-    
-    <category term="Kafka" scheme="http://example.com/tags/Kafka/"/>
     
   </entry>
   
