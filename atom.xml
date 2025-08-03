@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2025-08-02T15:44:09.642Z</updated>
+  <updated>2025-08-03T13:03:18.631Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,20 +17,29 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>「are you okay」</title>
+    <link href="http://example.com/post/36003e6a.html"/>
+    <id>http://example.com/post/36003e6a.html</id>
+    <published>2025-08-03T12:52:00.048Z</published>
+    <updated>2025-08-03T13:03:18.631Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;很难想象「熊家餐厅」已经播到第四季了，捡起第二季从头开始。</summary>
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
     <title>一发多巴胺</title>
     <link href="http://example.com/post/f4d8687.html"/>
     <id>http://example.com/post/f4d8687.html</id>
     <published>2025-08-02T15:36:32.964Z</published>
-    <updated>2025-08-02T15:44:09.642Z</updated>
+    <updated>2025-08-03T13:04:08.193Z</updated>
     
     
-      
-      
-        
-        
-    <summary type="html"></summary>
-        
-      
+    <summary type="html">&lt;p&gt;打算每天更新 blog，打开了 hexo next 的官网打算看一些扩展。</summary>
     
     
     
@@ -42,16 +51,10 @@
     <link href="http://example.com/post/1ae11200.html"/>
     <id>http://example.com/post/1ae11200.html</id>
     <published>2025-08-02T15:11:10.576Z</published>
-    <updated>2025-08-02T15:32:46.899Z</updated>
+    <updated>2025-08-03T13:03:39.899Z</updated>
     
     
-      
-      
-        
-        
-    <summary type="html"></summary>
-        
-      
+    <summary type="html">&lt;p&gt;期末季没什么心情看电影，其他时间都拿来打斯普拉痛和 animal well 了。</summary>
     
     
     
@@ -78,11 +81,10 @@
     <link href="http://example.com/post/2369de45.html"/>
     <id>http://example.com/post/2369de45.html</id>
     <published>2023-01-24T23:00:00.000Z</published>
-    <updated>2025-08-02T15:29:04.112Z</updated>
+    <updated>2025-08-03T13:03:36.408Z</updated>
     
     
-    <summary type="html">&lt;p&gt;原文 from youtube &lt;a href=&quot;https://www.youtube.com/watch?v=ZZ_4gzoDDAE&quot;&gt;学外语如何毁了我&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;In summer 2015 when I was walking by Magus Books, my favorite bookstore in Seattle. At 3 AM morning, my eyes were immediately caught by the title of a book in the yellow glim behind the window.</summary>
+    <summary type="html">&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=ZZ_4gzoDDAE&quot;&gt;学外语如何毁了我&lt;/a&gt;</summary>
     
     
     
